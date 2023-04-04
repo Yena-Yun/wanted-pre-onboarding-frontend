@@ -1,4 +1,6 @@
-.register-form {
+@import 'styles/mixins.scss';
+
+.registerForm {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,42 +9,39 @@
   padding: 3rem;
 }
 
-.form-label {
+.formLabel {
   display: flex;
   flex-direction: column;
   width: 100%;
   margin-bottom: 2rem;
+
+  span {
+    margin-bottom: 0.8rem;
+    font-size: 18px;
+    font-weight: 700;
+    order: 1;
+  }
+
+  input {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    order: 2;
+  }
 }
 
-.form-label span {
-  margin-bottom: 0.8rem;
-  font-size: 18px;
-  font-weight: 700;
-  order: 1;
-}
-
-.form-label input {
-  width: 100%;
-  padding: 1rem;
-  margin-bottom: 0.5rem;
-  order: 2;
-}
-
-.disabled-button {
-  width: 100%;
-  padding: 1rem;
-  margin-top: 1rem;
-  cursor: default;
-}
-
-.signin-button {
+.submitButton {
   width: 100%;
   padding: 1rem;
   margin-top: 1rem;
   cursor: pointer;
+
+  &.disabledButton {
+    cursor: default;
+  }
 }
 
-.move-to-signup {
+.moveToSignup {
   margin-top: 2rem;
   font-size: 14px;
   color: #888888;

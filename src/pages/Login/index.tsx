@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { axiosClient } from 'api/axiosClient';
-import './Login.scss';
+import styles from './Login.module.scss';
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -46,21 +46,20 @@ export const Login = () => {
   };
 
   return (
-    <form className='register-form' onSubmit={submitFormHandler}>
+    <form className={styles.registerForm} onSubmit={submitFormHandler}>
       <h1>로그인</h1>
-      <label className='form-label'>
+      <label className={styles.formLabel}>
         <input
           value={formInput.email}
-          className='email-login-input'
           data-testid='email-login-input'
           onChange={inputChangeHandler}
         />
         <span>이메일</span>
       </label>
-      <label className='form-label'>
+      <label className={styles.formLabel}>
         <input
+          type='password'
           value={formInput.password}
-          className='password-login-input'
           data-testid='password-login-input'
           onChange={inputChangeHandler}
         />
@@ -72,17 +71,16 @@ export const Login = () => {
         disabled={
           !formInput.email.includes('@') || formInput.password.length < 8
         }
-        className={
-          !formInput.email.includes('@') || formInput.password.length < 8
-            ? 'disabled-button'
-            : 'signin-button'
-        }
+        className={`${styles.submitButton} ${
+          (!formInput.email.includes('@') && styles.disabledButton) ||
+          (formInput.password.length < 8 && styles.disabledButton)
+        }`}
         data-testid='signin-button'
       >
         로그인
       </button>
 
-      <p className='move-to-signup' onClick={() => navigate('/signup')}>
+      <p className={styles.moveToSignup} onClick={() => navigate('/signup')}>
         회원가입하러 가기
       </p>
     </form>
