@@ -4,6 +4,7 @@ import { legacy_createStore as createStore } from 'redux';
 import { Provider } from 'react-redux';
 import rootReducer from 'store';
 import App from './App';
+import './styles/global.scss';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
