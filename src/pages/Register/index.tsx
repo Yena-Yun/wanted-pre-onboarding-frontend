@@ -19,7 +19,6 @@ export const Register = () => {
 
   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target;
-    console.log(target);
 
     if (formInput.email.includes('@')) {
       setEmailError(false);
