@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { axiosClient } from 'api/axiosClient';
+import { useAuth } from 'hooks/useAuth';
 import styles from './Login.module.scss';
 
 export const Login = () => {
@@ -9,6 +10,8 @@ export const Login = () => {
     email: '',
     password: '',
   });
+
+  const { login } = useAuth();
 
   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target;
@@ -20,22 +23,17 @@ export const Login = () => {
     }
   };
 
-  const validation = () => {
-    if (formInput.email.includes('@') && formInput.password.length > 8) {
-      return true;
-    }
-
-    return false;
-  };
-
   const submitFormHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      await axiosClient.post('/auth/signin', formInput);
+      const { status, data } = await axiosClient.post(
+        '/auth/signin',
+        formInput
+      );
 
-      if (validation()) {
-        navigate('/todo');
+      if (status === 200) {
+        login(data.access_token);
       }
     } catch (err: any) {
       console.log(
