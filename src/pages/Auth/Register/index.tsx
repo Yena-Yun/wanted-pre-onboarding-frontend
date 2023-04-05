@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { axiosClient } from 'api/axiosClient';
 import styles from './Register.module.scss';
 
+const EMAIL = 'email';
+const PASSWORD = 'password';
+
 export const Register = () => {
   const navigate = useNavigate();
   const [formInput, setFormInput] = useState({
@@ -19,24 +22,19 @@ export const Register = () => {
 
   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target;
+    const keyName = target.dataset.testid as typeof EMAIL | typeof PASSWORD;
 
-    if (formInput.email.includes('@')) {
-      setEmailError(false);
-    }
+    if (formInput.email.includes('@')) setEmailError(false);
+    if (formInput.password.length > 6) setPasswordError(false);
 
-    if (formInput.password.length > 6) {
-      setPasswordError(false);
-    }
-
-    if (target.dataset.testid === 'email-input') {
-      setFormInput((prev) => ({ ...prev, email: target.value }));
-    } else {
-      setFormInput((prev) => ({ ...prev, password: target.value }));
-    }
+    setFormInput((prev) => ({
+      ...prev,
+      [keyName.split('-')[0]]: target.value,
+    }));
   };
 
   const validation = () => {
-    if (formInput.email.includes('@') && formInput.password.length > 6) {
+    if (formInput.email.includes('@') && formInput.password.length > 8) {
       alert('회원가입에 성공했습니다! 로그인을 진행해주세요');
       return true;
     } else {
@@ -51,24 +49,24 @@ export const Register = () => {
     try {
       await axiosClient.post('/auth/signup', formInput);
 
-      if (validation()) {
-        navigate('/signin');
-      }
+      if (validation()) navigate('/signin');
     } catch (err: any) {
-      console.log(
-        err.response.data.statusCode + ' ' + err.response.data.message
-      );
-      alert(err.response.data.message); // 예: '동일한 이메일이 이미 존재합니다.'
+      const errResponse = err.response.data;
+
+      console.log(errResponse.statusCode + ' ' + errResponse.message);
+      alert(errResponse.message); // 예: '동일한 이메일이 이미 존재합니다.'
     }
   };
+
+  const { email, password } = formInput;
 
   return (
     <form className={styles.registerForm} onSubmit={submitFormHandler}>
       <h1>회원가입</h1>
       <label className={styles.formLabel}>
         <input
-          value={formInput.email}
-          data-testid='email-input'
+          value={email}
+          data-testid={`${EMAIL}-input`}
           onChange={inputChangeHandler}
         />
         <span>이메일</span>
@@ -76,9 +74,9 @@ export const Register = () => {
       </label>
       <label className={styles.formLabel}>
         <input
-          type='password'
-          value={formInput.password}
-          data-testid='password-input'
+          type={PASSWORD}
+          value={password}
+          data-testid={`${PASSWORD}-input`}
           onChange={inputChangeHandler}
         />
         <span>비밀번호</span>
@@ -87,14 +85,12 @@ export const Register = () => {
 
       <button
         type='submit'
-        disabled={
-          !formInput.email.includes('@') || formInput.password.length < 8
-        }
-        className={`${styles.submitButton} ${
-          (!formInput.email.includes('@') && styles.disabledButton) ||
-          (formInput.password.length < 8 && styles.disabledButton)
-        }`}
         data-testid='signup-button'
+        className={`${styles.submitButton} ${
+          (!email.includes('@') && styles.disabledButton) ||
+          (password.length < 8 && styles.disabledButton)
+        }`}
+        disabled={!email.includes('@') || password.length < 8}
       >
         회원가입
       </button>

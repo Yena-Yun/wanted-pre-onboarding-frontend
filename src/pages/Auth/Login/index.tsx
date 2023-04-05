@@ -30,16 +30,12 @@ export const Login = () => {
     e.preventDefault();
 
     try {
-      const { status, data } = await axiosClient.post(
-        '/auth/signin',
-        formInput
-      );
+      const { data } = await axiosClient.post('/auth/signin', formInput);
 
-      if (status === 200) {
-        login(data.access_token);
-      }
+      login(data.access_token);
     } catch (err: any) {
       const errResponse = err.response.data;
+
       console.log(errResponse.statusCode + ' ' + errResponse.message);
       alert(errResponse.message); // 예: '해당 사용자가 존재하지 않습니다.'
     }
