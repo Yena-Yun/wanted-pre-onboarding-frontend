@@ -24,7 +24,7 @@ export const Register = () => {
       setEmailError(false);
     }
 
-    if (formInput.password.length > 8) {
+    if (formInput.password.length > 6) {
       setPasswordError(false);
     }
 
@@ -36,7 +36,7 @@ export const Register = () => {
   };
 
   const validation = () => {
-    if (formInput.email.includes('@') && formInput.password.length > 8) {
+    if (formInput.email.includes('@') && formInput.password.length > 6) {
       alert('회원가입에 성공했습니다! 로그인을 진행해주세요');
       return true;
     } else {
