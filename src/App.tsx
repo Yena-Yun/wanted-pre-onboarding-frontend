@@ -1,28 +1,32 @@
-import { Home } from 'pages/Home';
-import { Login } from 'pages/Login';
-import { Register } from 'pages/Register';
-import { Todo } from 'pages/Todo';
 import {
   createBrowserRouter,
   createRoutesFromElements,
+  Navigate,
   Route,
   RouterProvider,
 } from 'react-router-dom';
-import { HomeLayout } from 'smart-components/HomeLayout';
-import { ProtectedLayout } from 'smart-components/ProtectedLayout';
+import { Login, Register, Todo } from 'pages';
+import {
+  AuthLayout,
+  HomeLayout,
+  ProtectedLayout,
+} from 'smart-components/Layout';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
-      <Route element={<HomeLayout />}>
-        <Route path='/' element={<Home />} />
-        <Route path='/signin' element={<Login />} />
-        <Route path='/signup' element={<Register />} />
-      </Route>
+      <Route element={<AuthLayout />}>
+        <Route element={<HomeLayout />}>
+          <Route path='/' element={<Navigate replace to='/signin' />} />
+          <Route path='/signin' element={<Login />} />
+          <Route path='/signup' element={<Register />} />
+        </Route>
 
-      <Route element={<ProtectedLayout />}>
-        <Route path='/todo' element={<Todo />} />
+        <Route element={<ProtectedLayout />}>
+          <Route path='/todo' element={<Todo />} />
+        </Route>
       </Route>
+      <Route path='/*' element={<Navigate to='/' />} />
     </>
   )
 );
