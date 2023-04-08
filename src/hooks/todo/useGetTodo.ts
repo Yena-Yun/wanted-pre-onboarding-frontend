@@ -1,4 +1,4 @@
-import { todoApi } from 'api/todoApi';
+// import { todoApi } from 'api/todoApi';
 import { useState } from 'react';
 import { TodoProps } from 'types/todoType';
 
@@ -7,9 +7,9 @@ export const useGetTodo = (): [boolean, TodoProps[], () => Promise<void>] => {
   const [todos, setTodos] = useState<TodoProps[]>([]);
 
   const getTodos = async () => {
-    const { data } = await todoApi.getTodos();
+    // const { data } = await todoApi.getTodos();
 
-    setTodos(data);
+    // setTodos(data);
     setIsLoading(false);
   };
 

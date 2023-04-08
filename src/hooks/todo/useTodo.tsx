@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useContext, useMemo, useState } from 'react';
-import { todoApi } from 'api/todoApi';
+// import { todoApi } from 'api/todoApi';
 import { TodoProps } from 'types/todoType';
 
 interface TodoProp {
@@ -25,9 +25,9 @@ export const TodoProvider = ({ children }: TodoProp) => {
   const [todos, setTodos] = useState<TodoProps[]>([]);
 
   const getTodos = async (): Promise<void> => {
-    const { data } = await todoApi.getTodos();
+    // const { data } = await todoApi.getTodos();
 
-    setTodos(data);
+    // setTodos(data);
     setIsLoading(false);
   };
 
