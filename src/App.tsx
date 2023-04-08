@@ -21,7 +21,6 @@ const router = createBrowserRouter(
           <Route path='/signin' element={<Login />} />
           <Route path='/signup' element={<Register />} />
         </Route>
-
         <Route element={<ProtectedLayout />}>
           <Route path='/todo' element={<Todo />} />
         </Route>
