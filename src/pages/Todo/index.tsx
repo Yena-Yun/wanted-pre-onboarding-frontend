@@ -25,50 +25,12 @@ export const Todo = () => {
 
   useEffect(() => {
     if (storageTodos.length < 1) return;
-
     setStorageTodos(storageTodos);
   }, [storageTodos]);
 
-  const inputFocus = useCallback((inputElement: HTMLInputElement) => {
-    if (inputElement) {
-      inputElement.focus();
-    }
-  }, []);
-
   const inputChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.currentTarget.value;
-    setValue(value);
+    setValue(e.currentTarget.value);
   };
-
-  const openUpdate = (id: string) => {
-    setIsUpdateId(id);
-  };
-
-  const cancelUpdate = () => {
-    setIsUpdateId('');
-    setModifiedValue('');
-  };
-
-  const toggleComplete = (id: string) => {
-    const updatedComplete = storageTodos.map((prev: TodoProps) =>
-      prev.id === id
-        ? {
-            ...prev,
-            isCompleted: !prev.isCompleted,
-          }
-        : prev
-    );
-
-    setStorageTodos(updatedComplete);
-  };
-
-  useEffect(() => {
-    inputFocus(modifyInputRef.current as HTMLInputElement);
-  }, [isUpdateId]);
-
-  useEffect(() => {
-    inputFocus(createInputRef.current as HTMLInputElement);
-  }, [storageTodos]);
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,6 +45,38 @@ export const Todo = () => {
 
     setStorageTodos((prev: TodoProps[]) => [...prev, newTodo]);
     setValue('');
+  };
+
+  const openUpdate = (id: string) => {
+    setIsUpdateId(id);
+  };
+
+  const cancelUpdate = () => {
+    setIsUpdateId('');
+    setModifiedValue('');
+  };
+
+  const updateTodo = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
+    if (isUpdateId === id) {
+      setModifiedValue(e.currentTarget.value);
+    }
+  };
+
+  const deleteTodo = (id: string) => {
+    setStorageTodos(storageTodos.filter((todo: TodoProps) => todo.id !== id));
+  };
+
+  const toggleComplete = (id: string) => {
+    const updateComplete = storageTodos.map((prev: TodoProps) =>
+      prev.id === id
+        ? {
+            ...prev,
+            isCompleted: !prev.isCompleted,
+          }
+        : prev
+    );
+
+    setStorageTodos(updateComplete);
   };
 
   const submitUpdate = (id: string) => {
@@ -107,15 +101,19 @@ export const Todo = () => {
     setIsUpdateId('');
   };
 
-  const updateTodo = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
-    if (isUpdateId === id) {
-      setModifiedValue(e.currentTarget.value);
+  const inputAutoFocus = useCallback((inputElement: HTMLInputElement) => {
+    if (inputElement) {
+      inputElement.focus();
     }
-  };
+  }, []);
 
-  const deleteTodo = (id: string) => {
-    setStorageTodos(storageTodos.filter((todo: TodoProps) => todo.id !== id));
-  };
+  useEffect(() => {
+    inputAutoFocus(modifyInputRef.current as HTMLInputElement);
+  }, [isUpdateId]);
+
+  useEffect(() => {
+    inputAutoFocus(createInputRef.current as HTMLInputElement);
+  }, [storageTodos]);
 
   return (
     <>
