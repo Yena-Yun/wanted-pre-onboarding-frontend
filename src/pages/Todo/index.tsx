@@ -6,7 +6,6 @@ import React, {
   useState,
 } from 'react';
 import { TodoProps } from 'types/todoType';
-import { todoApi } from 'api/todoApi';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 
 export const Todo = () => {
@@ -33,13 +32,18 @@ export const Todo = () => {
 
     if (value.length < 1) return;
 
-    const { status, data } = await todoApi.createTodo(value);
+    // const { status, data } = await todoApi.createTodo(value);
+
+    const newTodo = {
+      todo: value,
+      isCompleted: false,
+    };
+
+    // if (status === 201) {
+    setStorageTodos((prev: TodoProps[]) => [...prev, newTodo]);
+    // }
 
     setValue('');
-
-    if (status === 201) {
-      setStorageTodos((prev: TodoProps[]) => [...prev, data]);
-    }
   };
 
   const openUpdate = (id: number) => {
@@ -59,7 +63,7 @@ export const Todo = () => {
 
   const deleteTodo = async (id: number) => {
     setStorageTodos(storageTodos.filter((todo: TodoProps) => todo.id !== id));
-    await todoApi.deleteTodo(id);
+    // await todoApi.deleteTodo(id);
   };
 
   const toggleComplete = async (id: number) => {
