@@ -1,4 +1,3 @@
-import { useLocalStorage } from 'hooks/useLocalStorage';
 import React, {
   Fragment,
   useCallback,
@@ -7,6 +6,7 @@ import React, {
   useState,
 } from 'react';
 import { v4 as uuid4 } from 'uuid';
+import { useLocalStorage } from 'hooks/useLocalStorage';
 
 interface TodoProps {
   id: string;
@@ -18,11 +18,16 @@ export const Todo = () => {
   const [value, setValue] = useState('');
   const [modifiedValue, setModifiedValue] = useState('');
   const [isUpdateId, setIsUpdateId] = useState('');
-  const checkRef = useRef(null);
   const createInputRef = useRef<HTMLInputElement>(null);
   const modifyInputRef = useRef<HTMLInputElement>(null);
 
   const [storageTodos, setStorageTodos] = useLocalStorage('todos', []);
+
+  useEffect(() => {
+    if (storageTodos.length < 1) return;
+
+    setStorageTodos(storageTodos);
+  }, [storageTodos]);
 
   const inputFocus = useCallback((inputElement: HTMLInputElement) => {
     if (inputElement) {
@@ -35,8 +40,26 @@ export const Todo = () => {
     setValue(value);
   };
 
-  const openUpdate = (e: React.MouseEvent<HTMLButtonElement>, id: string) => {
+  const openUpdate = (id: string) => {
     setIsUpdateId(id);
+  };
+
+  const cancelUpdate = () => {
+    setIsUpdateId('');
+    setModifiedValue('');
+  };
+
+  const toggleComplete = (id: string) => {
+    const updatedComplete = storageTodos.map((prev: TodoProps) =>
+      prev.id === id
+        ? {
+            ...prev,
+            isCompleted: !prev.isCompleted,
+          }
+        : prev
+    );
+
+    setStorageTodos(updatedComplete);
   };
 
   useEffect(() => {
@@ -50,40 +73,48 @@ export const Todo = () => {
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setStorageTodos((prev: TodoProps[]) => [
-      ...prev,
-      {
-        id: uuid4(),
-        title: value,
-        isCompleted: false,
-      },
-    ]);
+    if (value.length < 1) return;
 
+    const newTodo = {
+      id: uuid4().slice(0, 8),
+      title: value,
+      isCompleted: false,
+    };
+
+    setStorageTodos((prev: TodoProps[]) => [...prev, newTodo]);
     setValue('');
   };
 
-  useEffect(() => {
-    if (storageTodos.length < 1) return;
-
-    setStorageTodos(storageTodos);
-  }, [storageTodos]);
-
   const submitUpdate = (id: string) => {
-    const newTodo = {
+    if (modifiedValue.length < 1) {
+      cancelUpdate();
+      return;
+    }
+
+    const updatedTodo = {
       id,
       title: modifiedValue,
       isCompleted: false,
     };
 
     setStorageTodos(
-      storageTodos.map((prev: TodoProps) => (prev.id === id ? newTodo : prev))
+      storageTodos.map((prev: TodoProps) =>
+        prev.id === id ? updatedTodo : prev
+      )
     );
 
+    setModifiedValue('');
     setIsUpdateId('');
   };
 
-  const updateTodo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setModifiedValue(e.currentTarget.value);
+  const updateTodo = (e: React.ChangeEvent<HTMLInputElement>, id: string) => {
+    if (isUpdateId === id) {
+      setModifiedValue(e.currentTarget.value);
+    }
+  };
+
+  const deleteTodo = (id: string) => {
+    setStorageTodos(storageTodos.filter((todo: TodoProps) => todo.id !== id));
   };
 
   return (
@@ -106,27 +137,37 @@ export const Todo = () => {
             {isUpdateId !== todo.id ? (
               <li key={todo.id} id={todo.id}>
                 <label>
-                  <input id={todo.id} type='checkbox' ref={checkRef} />
+                  <input
+                    id={todo.id}
+                    type='checkbox'
+                    checked={todo.isCompleted}
+                    onChange={() => toggleComplete(todo.id)}
+                  />
                   <span>{todo.title}</span>
                 </label>
                 <button
                   id={todo.id}
                   data-testid='modify-button'
-                  onClick={(e) => openUpdate(e, todo.id)}
+                  onClick={() => openUpdate(todo.id)}
                 >
                   수정
                 </button>
-                <button data-testid='delete-button'>삭제</button>
+                <button
+                  data-testid='delete-button'
+                  onClick={() => deleteTodo(todo.id)}
+                >
+                  삭제
+                </button>
               </li>
             ) : (
               <li key={todo.id} id={todo.id}>
                 <label>
-                  <input id={todo.id} type='checkbox' ref={checkRef} />
+                  <input id={todo.id} type='checkbox' disabled />
                   <input
                     ref={modifyInputRef}
                     value={modifiedValue}
                     data-testid='modify-input'
-                    onChange={(e) => updateTodo(e)}
+                    onChange={(e) => updateTodo(e, todo.id)}
                   />
                 </label>
                 <button
@@ -135,7 +176,9 @@ export const Todo = () => {
                 >
                   제출
                 </button>
-                <button data-testid='cancel-button'>취소</button>
+                <button data-testid='cancel-button' onClick={cancelUpdate}>
+                  취소
+                </button>
               </li>
             )}
           </Fragment>
