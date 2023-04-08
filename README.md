@@ -5,5 +5,5 @@
 ## 🎡 실행 방법
 
 ```
-git clone - yarn install - yarn start
+git clone - code 클론한 프로젝트명 - yarn install - yarn start
 ```
