@@ -7,6 +7,11 @@ import React, {
 } from 'react';
 import { TodoProps } from 'types/todoType';
 import { useLocalStorage } from 'hooks/useLocalStorage';
+import { axiosTokenClient } from 'api/axiosClient';
+import axios from 'axios';
+import { EditModal } from './EditModal';
+import styles from './Todo.module.scss';
+import { BASE_URL } from 'api/const';
 
 export const Todo = () => {
   const [value, setValue] = useState('');
@@ -16,6 +21,7 @@ export const Todo = () => {
   const modifyInputRef = useRef<HTMLInputElement>(null);
 
   const [storageTodos, setStorageTodos] = useLocalStorage('todos', []);
+  const [storageToken, setStorageToken] = useLocalStorage('accessToken', '');
 
   useEffect(() => {
     if (storageTodos.length < 1) return;
@@ -38,6 +44,21 @@ export const Todo = () => {
       todo: value,
       isCompleted: false,
     };
+
+    // const result = await axiosTokenClient.post('/todos', { todo: value });
+
+    const result = await axios.post(
+      `${BASE_URL}/todos`,
+      { todo: value },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${storageToken}`,
+        },
+      }
+    );
+
+    console.log(result);
 
     // if (status === 201) {
     setStorageTodos((prev: TodoProps[]) => [...prev, newTodo]);
@@ -147,53 +168,38 @@ export const Todo = () => {
       {/* Todo 리스트 */}
       <ul>
         {storageTodos.map(({ id, todo, isCompleted }: TodoProps) => (
-          <Fragment key={id}>
-            {isUpdateId !== id ? (
-              <li key={id}>
-                <label>
-                  <input
-                    type='checkbox'
-                    checked={isCompleted}
-                    onChange={() => toggleComplete(id)}
-                  />
-                  <span>{todo}</span>
-                </label>
-                <button
-                  data-testid='modify-button'
-                  onClick={() => openUpdate(id)}
-                >
-                  수정
-                </button>
-                <button
-                  data-testid='delete-button'
-                  onClick={() => deleteTodo(id)}
-                >
-                  삭제
-                </button>
-              </li>
-            ) : (
-              <li key={id}>
-                <label>
-                  <input type='checkbox' checked={isCompleted} disabled />
-                  <input
-                    ref={modifyInputRef}
-                    value={modifiedValue.length < 1 ? todo : modifiedValue}
-                    data-testid='modify-input'
-                    onChange={(e) => updateTodo(e, id)}
-                  />
-                </label>
-                <button
-                  data-testid='submit-button'
-                  onClick={() => submitUpdate(id)}
-                >
-                  제출
-                </button>
-                <button data-testid='cancel-button' onClick={cancelUpdate}>
-                  취소
-                </button>
-              </li>
+          <li key={id} className={styles.todoItem}>
+            <>
+              <label>
+                <input
+                  type='checkbox'
+                  checked={isCompleted}
+                  onChange={() => toggleComplete(id)}
+                />
+                <span>{todo}</span>
+              </label>
+              <button
+                data-testid='modify-button'
+                onClick={() => openUpdate(id)}
+              >
+                수정
+              </button>
+              <button
+                data-testid='delete-button'
+                onClick={() => deleteTodo(id)}
+              >
+                삭제
+              </button>
+            </>
+            {isUpdateId === id && (
+              <EditModal
+                todoProps={{ id, todo, isCompleted }}
+                modifyInfo={{ modifyInputRef, modifiedValue }}
+                updateTodo={updateTodo}
+                actionFunc={{ submitUpdate, cancelUpdate }}
+              />
             )}
-          </Fragment>
+          </li>
         ))}
       </ul>
     </>
